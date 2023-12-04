@@ -11,7 +11,7 @@ router.post("/student/add", async (req, res) => {
 
   // handle email uniqueness
 
-  // check if user for new student already exists
+  // check if user for newStudent already exists
   const student = await Student.findOne({ email: newStudent.email });
 
   // is student exists, throw error
@@ -29,4 +29,13 @@ router.post("/student/add", async (req, res) => {
   }
   // send appropriate response
   return res.status(200).send({ message: "student added" });
+});
+
+router.get("/students", async (req, res) => {
+  try {
+    const students = await Student.find();
+    return res.status(200).send(students);
+  } catch (error) {
+    return res.status(400).send({ message: "Student not found" });
+  }
 });
