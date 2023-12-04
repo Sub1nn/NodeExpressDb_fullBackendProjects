@@ -5,7 +5,7 @@ export const dbConnect = async () => {
     await mongoose.connect(
       "mongodb+srv://sub_1n:maya2046Lai@subin01.bbc2g1d.mongodb.net/narrowway?retryWrites=true&w=majority"
     );
-    console.log("Database Connection established");
+    console.log("Database connection established");
   } catch (error) {
     console.log(error.message);
     console.log("Failed to connect to database");
