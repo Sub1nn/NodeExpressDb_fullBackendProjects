@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 // set rules
 const teacherSchema = new mongoose.Schema({
   name: {
