@@ -1,12 +1,17 @@
 import express from "express";
 import { dbConnect } from "./db.connect.js";
-const app = express();
 import studentRoutes from "./student.routes.js";
-app.use(express.json());
 import courseRoutes from "./course.routes.js";
+
+const app = express();
+
+// json middleware
+app.use(express.json());
 
 // connect db
 dbConnect();
+
+// register routes
 app.use(studentRoutes);
 app.use(courseRoutes);
 
