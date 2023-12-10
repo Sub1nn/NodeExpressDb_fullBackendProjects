@@ -6,16 +6,18 @@ const courseSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    minlength: 1,
+    maxlength: 55,
   },
   price: {
     type: Number,
     required: true,
-    trim: true,
+    min: 1,
   },
   duration: {
     type: Number,
     required: true,
-    trim: true,
+    min: 1,
   },
 });
 
