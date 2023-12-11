@@ -7,7 +7,9 @@ export const connectDb = async () => {
     await mongoose.connect(
       `mongodb+srv://sub_1n:${dbPass}@subin01.bbc2g1d.mongodb.net/${dbName}?retryWrites=true&w=majority`
     );
+    console.log("Data connection successful");
   } catch (error) {
+    console.log("DB connection failed");
     console.log(error.message);
   }
 };
