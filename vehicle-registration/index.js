@@ -11,7 +11,7 @@ app.use(express.json());
 connectDb();
 
 // register routes
-app.use(vehicleRoutes);
+app.use("/vehicle", vehicleRoutes);
 
 const port = 8000;
 
