@@ -22,12 +22,12 @@ const vehicleSchema = new mongoose.Schema(
     power: {
       type: Number,
       required: true,
-      min: 0,
+      min: 1,
     },
     torque: {
       type: Number,
       required: true,
-      min: 0,
+      min: 1,
     },
   },
   {
