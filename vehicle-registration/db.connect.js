@@ -1,12 +1,12 @@
+import dotenv from "dotenv";
 import mongoose from "mongoose";
 
-const dbName = "vehicle-registration";
-const dbPass = "maya2046Lai";
+dotenv.config();
+const MONGO_URL = process.env.MONGO_URL;
+
 export const connectDb = async () => {
   try {
-    await mongoose.connect(
-      `mongodb+srv://sub_1n:${dbPass}@subin01.bbc2g1d.mongodb.net/${dbName}?retryWrites=true&w=majority`
-    );
+    await mongoose.connect(MONGO_URL);
     console.log("Data connection successful");
   } catch (error) {
     console.log("DB connection failed");
