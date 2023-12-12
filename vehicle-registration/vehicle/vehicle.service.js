@@ -29,9 +29,9 @@ export const addVehicle = async (req, res) => {
 export const getSingleVehicleDetail = async (req, res) => {
   const vehicleId = req.params.id;
   // validate for mongo id
-  const isValid = checkMongoIdValidity(vehicleId);
+  const isValidId = checkMongoIdValidity(vehicleId);
   // if not valid mongo id
-  if (!isValid) {
+  if (!isValidId) {
     return res.status(400).send({ message: "Invalid Vehicle Id" });
   }
   const vehicle = await Vehicle.findById(vehicleId);
@@ -57,6 +57,15 @@ export const getVehicleDetails = async (req, res) => {
 export const updateVehicle = async (req, res) => {
   const vehicleId = req.params.id;
   const vehicleToBeUpdated = req.body;
+  const isValidId = checkMongoIdValidity(vehicleId);
+  if (!isValidId) {
+    return res.status(400).send({ message: "Invalid Vehicle Id" });
+  }
+  try {
+    await vehicleValidationSchema.validate(vehicleToBeUpdated);
+  } catch (error) {
+    return res.status(400).send({ message: error.message });
+  }
   const vehicle = await Vehicle.findById(vehicleId);
   if (!vehicle) {
     res.status(400).send({ message: "Invalid vehicle Id" });
@@ -69,6 +78,10 @@ export const updateVehicle = async (req, res) => {
 
 export const deleteVehicle = async (req, res) => {
   const vehicleId = req.params.id;
+  const isValidId = checkMongoIdValidity(vehicleId);
+  if (!isValidId) {
+    return res.status(400).send({ message: "Invalid Vehicle Id" });
+  }
   const vehicle = await Vehicle.findById(vehicleId);
   if (!vehicle) {
     res.status(400).send({ message: "Invalid vehicle Id" });
