@@ -2,38 +2,52 @@ import { Vehicle } from "./vehicle.model.js";
 import { vehicleValidationSchema } from "./vehicleValidation.schema.js";
 import { checkMongoIdValidity } from "../utils.js";
 
-// add a vehicle
-export const addVehicle = async (req, res) => {
+// ? validate vehicle data
+export const validateVehicleData = async (req, res, next) => {
+  // extract vehicle data from req.body
   const newVehicle = req.body;
-
+  // validate vehicle data
   try {
     await vehicleValidationSchema.validate(newVehicle);
   } catch (error) {
     return res.status(400).send({ message: error.message });
   }
-  const vehicle = await Vehicle.findOne({ name: newVehicle.name });
-  if (vehicle) {
-    return res
-      .status(409)
-      .send({ message: "Vehicle with the name already exists" });
-  }
-  try {
-    await Vehicle.create(newVehicle);
-  } catch (error) {
-    return res.status(400).send(error.message);
-  }
-  return res.status(200).send({ message: "Vehicle added successfully" });
+  next();
 };
 
-// Get single vehicle details
-export const getSingleVehicleDetail = async (req, res) => {
+// ? validate vehicle id
+export const validateVehicleId = (req, res, next) => {
+  // validate vehicle id for mongo id validation
   const vehicleId = req.params.id;
-  // validate for mongo id
   const isValidId = checkMongoIdValidity(vehicleId);
-  // if not valid mongo id
   if (!isValidId) {
     return res.status(400).send({ message: "Invalid Vehicle Id" });
   }
+  next();
+};
+
+// ? check if vehicle exists
+export const checkIfVehicleExists = async (req, res, next) => {
+  // check if vehicle with the id exists
+  const vehicleId = req.params.id;
+  const vehicle = await Vehicle.findById(vehicleId);
+  if (!vehicle) {
+    res.status(400).send({ message: "Vehicle does not exist" });
+  }
+  next();
+};
+
+// ? add a vehicle to db
+export const addVehicle = async (req, res) => {
+  const newVehicle = req.body;
+
+  await Vehicle.create(newVehicle);
+  return res.status(200).send({ message: "Vehicle added successfully" });
+};
+
+// ? Get single vehicle details
+export const getSingleVehicleDetail = async (req, res) => {
+  const vehicleId = req.params.id;
   const vehicle = await Vehicle.findById(vehicleId);
   if (!vehicle) {
     res.status(400).send({ message: "Invalid vehicle Id" });
@@ -41,8 +55,7 @@ export const getSingleVehicleDetail = async (req, res) => {
   return res.status(200).send(vehicle);
 };
 
-// get  all vehicle details
-
+// ? get  all vehicle details
 export const getVehicleDetails = async (req, res) => {
   try {
     const vehicleList = await Vehicle.find();
@@ -52,40 +65,23 @@ export const getVehicleDetails = async (req, res) => {
   }
 };
 
-// update a vehicle
-
+// ? update a vehicle
 export const updateVehicle = async (req, res) => {
+  // extract id from req.params
   const vehicleId = req.params.id;
+  //extract new values form req.body
   const vehicleToBeUpdated = req.body;
-  const isValidId = checkMongoIdValidity(vehicleId);
-  if (!isValidId) {
-    return res.status(400).send({ message: "Invalid Vehicle Id" });
-  }
-  try {
-    await vehicleValidationSchema.validate(vehicleToBeUpdated);
-  } catch (error) {
-    return res.status(400).send({ message: error.message });
-  }
-  const vehicle = await Vehicle.findById(vehicleId);
-  if (!vehicle) {
-    res.status(400).send({ message: "Invalid vehicle Id" });
-  }
+  // finally update vehicle with find condition and update condition
   await Vehicle.updateOne({ _id: vehicleId }, { ...vehicleToBeUpdated });
+  // return appropriate response
   return res.status(200).send({ message: "Vehicle updated successfully" });
 };
 
-// delete a vehicle
-
+// ? delete a vehicle
 export const deleteVehicle = async (req, res) => {
+  //extract id from req.params
   const vehicleId = req.params.id;
-  const isValidId = checkMongoIdValidity(vehicleId);
-  if (!isValidId) {
-    return res.status(400).send({ message: "Invalid Vehicle Id" });
-  }
-  const vehicle = await Vehicle.findById(vehicleId);
-  if (!vehicle) {
-    res.status(400).send({ message: "Invalid vehicle Id" });
-  }
+  // delete vehicle
   await Vehicle.deleteOne({ _id: vehicleId });
   return res.status(200).send({ message: "Vehicle deleted successfully" });
 };
