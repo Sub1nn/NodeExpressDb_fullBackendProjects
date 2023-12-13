@@ -1,38 +1,26 @@
 import express from "express";
 import { Course } from "./course.model.js";
-import * as Yup from "yup";
 import { checkMongoIdValidity } from "./utils.js";
+import { courseValidationSchema } from "./courseValidation.schema.js";
 
 const router = express.Router();
 
-// add course
+// ? add course
 router.post("/course/add", async (req, res) => {
   const newCourse = req.body;
 
-  //validate courseSchema with Yup
-  let courseSchema = Yup.object({
-    name: Yup.string()
-      .required()
-      .trim()
-      .min(1, "Name must be at least 1 character")
-      .max(55, "Name must not be more than 55 chars long"),
-    price: Yup.number().required().min(1, "Price must be at least 1 euros"),
-    duration: Yup.number()
-      .required()
-      .min(1, "Duration must be  at least 1 day"),
-  });
-
+  //validate courseSchema
   try {
-    await courseSchema.validate(newCourse);
+    await courseValidationSchema.validate(newCourse);
   } catch (error) {
     return res.status(400).send({ message: error.message });
   }
-
+  // create course after validation
   await Course.create(newCourse);
   res.status(200).send({ message: "New Course Created" });
 });
 
-// get a single course details
+// ? get a single course details
 router.get("/course/details/:id", async (req, res) => {
   const courseId = req.params.id;
   // validate for mongo id
@@ -51,7 +39,7 @@ router.get("/course/details/:id", async (req, res) => {
   return res.status(200).send(course);
 });
 
-// get all course details
+// ? get all course details
 router.get("/course", async (req, res) => {
   try {
     const courses = await Course.find();
@@ -61,7 +49,7 @@ router.get("/course", async (req, res) => {
   }
 });
 
-// delete a course
+// ? delete a course
 
 router.delete("course/delete/:id", async (req, res) => {
   const courseId = req.params.id;
@@ -74,17 +62,39 @@ router.delete("course/delete/:id", async (req, res) => {
     return res.status(400).send({ message: "Invalid course id." });
   }
 
-  //   find course
+  //   find course on the basis of course object Id
   const course = await Course.findOne({ _id: courseId });
 
   //   if not course
   if (!course) {
     return res.status(404).send({ message: "Course does not exist." });
   }
-
+  // delete course on the basis of course object Id
   await Course.deleteOne({ _id: courseId });
-
+  // return appropriate response
   return res.status(200).send({ message: "Course is removed successfully." });
 });
 
 export default router;
+
+// ? update a course
+
+router.get("/course/edit/:id", async (req, res) => {
+  courseId = req.params.id;
+  courseToBeUpdated = req.body;
+  try {
+    await courseValidationSchema.validate(courseToBeUpdated);
+  } catch (error) {
+    return res.status(400).send({ message: error.message });
+  }
+  const isValid = checkMongoIdValidity(courseId);
+  if (!isValid) {
+    return res.status(400).send({ message: "Invalid Course Id" });
+  }
+  const course = await Course.findById(courseId);
+  if (!course) {
+    res.status(400).send({ message: "Invalid course Id" });
+  }
+  await Course.updateOne({ _id: courseId }, { ...courseToBeUpdated });
+  return res.status(200).send({ message: "Course updated successfully" });
+});
