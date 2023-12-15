@@ -12,21 +12,21 @@ import {
 const router = express.Router();
 
 // find all laptop details
-router.get("/laptop/details", findAllLaptop);
+router.get("/details", findAllLaptop);
 
 // find single laptop detail
-router.get("/laptop/details/:id", validateLaptopId, findSingleLaptop);
+router.get("/details/:id", validateLaptopId, findSingleLaptop);
 
-router.post("/laptop/add", validateLaptopData, createLaptop);
+router.post("/add", validateLaptopData, createLaptop);
 
 router.put(
-  "/laptop/edit/:id",
+  "/edit/:id",
   validateLaptopId,
   validateLaptopData,
   checkIfLaptopExists,
   editLaptop
 );
 
-router.delete("/laptop/delete/:id", validateLaptopId, deleteLaptop);
+router.delete("/delete/:id", validateLaptopId, deleteLaptop);
 
 export default router;
