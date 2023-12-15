@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
 
+const MONGO_URI = process.env.MONGO_URI;
 export const dbConnect = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://sub_1n:maya2046Lai@subin01.bbc2g1d.mongodb.net/laptop-store?retryWrites=true&w=majority"
-    );
+    await mongoose.connect(MONGO_URI);
     console.log("Data connection established");
   } catch (error) {
     console.log("Failed to connect with database");
