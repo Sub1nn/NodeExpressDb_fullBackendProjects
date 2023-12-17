@@ -2,6 +2,7 @@ import { Laptop } from "../models/laptopModel.js";
 import { laptopSchemaValidator } from "../middlewares/LaptopSchemaValidator.js";
 import { mongoIdValidator } from "../middlewares/mongoIdValidator.js";
 
+// validate laptop database Id
 export const validateLaptopId = (req, res, next) => {
   const laptopId = req.params.id;
   const isValidId = mongoIdValidator(laptopId);
@@ -11,6 +12,7 @@ export const validateLaptopId = (req, res, next) => {
   next();
 };
 
+// validate laptop schema data
 export const validateLaptopData = async (req, res, next) => {
   const newLaptopData = req.body;
   try {
@@ -21,6 +23,7 @@ export const validateLaptopData = async (req, res, next) => {
   next();
 };
 
+// check if the laptop exists in the database
 export const checkIfLaptopExists = async (req, res, next) => {
   const laptopId = req.params.id;
   const laptop = await Laptop.findById(laptopId);
@@ -36,7 +39,7 @@ export const findAllLaptop = async (req, res) => {
     const laptopDetails = await Laptop.find();
     return res.status(200).send(laptopDetails);
   } catch (error) {
-    return res.status(400).send(error.message);
+    return res.status(500).send(error.message);
   }
 };
 
@@ -47,7 +50,7 @@ export const findSingleLaptop = async (req, res) => {
     const laptop = await Laptop.findById(laptopId);
     return res.status(200).send(laptop);
   } catch (error) {
-    return res.status(400).send(error.message);
+    return res.status(500).send(error.message);
   }
 };
 
