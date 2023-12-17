@@ -1,6 +1,6 @@
 import express from "express";
-import costumerRoutes from "./costumerRoute.js";
-import { dbConnect } from "./dbConnect.js";
+import costumerRoutes from "./costumer/costumerRoute.js";
+import { dbConnect } from "./config/dbConnect.js";
 const app = express();
 
 app.use(express.json());
