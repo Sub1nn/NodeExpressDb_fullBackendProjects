@@ -7,7 +7,7 @@ app.use(express.json());
 app.use(costumerRoutes);
 dbConnect();
 
-const port = 8002;
+const port = 8000;
 
 app.listen(port, () => {
   console.log(`App listening to port ${port}`);
