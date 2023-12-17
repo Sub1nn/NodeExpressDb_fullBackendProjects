@@ -17,8 +17,10 @@ router.get("/details", findAllLaptop);
 // find single laptop detail
 router.get("/details/:id", validateLaptopId, findSingleLaptop);
 
+// add a laptop
 router.post("/add", validateLaptopData, createLaptop);
 
+// update a laptop
 router.put(
   "/edit/:id",
   validateLaptopId,
@@ -27,6 +29,7 @@ router.put(
   editLaptop
 );
 
+// delete a laptop
 router.delete("/delete/:id", validateLaptopId, deleteLaptop);
 
 export default router;
