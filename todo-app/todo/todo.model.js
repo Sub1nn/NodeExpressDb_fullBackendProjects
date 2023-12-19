@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+
 const todoSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -15,6 +16,11 @@ const todoSchema = new mongoose.Schema({
   date: {
     type: Date,
     required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "User",
   },
 });
 
