@@ -1,6 +1,6 @@
 import { Vehicle } from "./vehicle.model.js";
 import { vehicleValidationSchema } from "./vehicleValidation.schema.js";
-import { checkMongoIdValidity } from "../utils.js";
+import { checkMongoIdValidity } from "../utils/mongoId.validation.js";
 
 // ? validate vehicle data
 export const validateVehicleData = async (req, res, next) => {
