@@ -8,13 +8,15 @@ import {
   updateVehicle,
   validateVehicleData,
   validateVehicleId,
+  validateVehicleOwner,
 } from "./vehicle.service.js";
+import { validateAccessToken } from "../middlewares/authentication.middleware.js";
 
 const router = express.Router();
 export default router;
 
 // ? create(add/register) a vehicle
-router.post("/add", validateVehicleData, addVehicle);
+router.post("/add", validateAccessToken, validateVehicleData, addVehicle);
 
 // ? get the list of all vehicles
 router.get("/details", getVehicleDetails);
@@ -34,7 +36,9 @@ router.put(
 // ? delete a vehicle
 router.delete(
   "/delete/:id",
+  validateAccessToken,
   validateVehicleId,
   checkIfVehicleExists,
+  validateVehicleOwner,
   deleteVehicle
 );
