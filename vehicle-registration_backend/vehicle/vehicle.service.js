@@ -26,6 +26,23 @@ export const validateVehicleId = (req, res, next) => {
   next();
 };
 
+// ? validate vehicle owner
+export const validateVehicleOwner = async (req, res, next) => {
+  //extract id from req.params
+  const vehicleId = req.params.id;
+  // check of the owner of todo is the logged in user with token userId
+  const vehicle = await Vehicle.findById(vehicleId);
+  const vehicleOwnerId = vehicle.userId;
+  const tokenUserId = req.user._id;
+  const isOwnerOfVehicle = tokenUserId.equals(vehicleOwnerId);
+  if (!isOwnerOfVehicle) {
+    res
+      .status(403)
+      .send({ message: "Only owner of the todo has authority to delete" });
+  }
+  next();
+};
+
 // ? check if vehicle exists
 export const checkIfVehicleExists = async (req, res, next) => {
   // check if vehicle with the id exists
@@ -40,6 +57,11 @@ export const checkIfVehicleExists = async (req, res, next) => {
 // ? add a vehicle to db
 export const addVehicle = async (req, res) => {
   const newVehicle = req.body;
+  const user = req.user;
+  if (!user) {
+    return res.status(401).send({ message: "user authorization failed" });
+  }
+  newVehicle.userId = user._id;
 
   await Vehicle.create(newVehicle);
   return res.status(200).send({ message: "Vehicle added successfully" });
