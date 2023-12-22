@@ -2,11 +2,15 @@ import express from "express";
 import { validateAccessToken } from "../middlewares/authentication.middleware.js";
 import { checkMongoIdValidity } from "../utils/mongoId.validity.js";
 import { Todo } from "./todo.model.js";
-import { todoValidationSchema } from "./todo.validation.js";
+import {
+  getTodoListValidationSchema,
+  todoValidationSchema,
+} from "./todo.validation.js";
+import { validateReqBody } from "../middlewares/validation.middleware.js";
 
 const router = express.Router();
 
-// add/create a todo
+// ? add/create a todo
 router.post(
   "/todo/add",
   validateAccessToken,
@@ -33,7 +37,7 @@ router.post(
   }
 );
 
-// delete a todo
+// ? delete a todo
 router.delete("/todo/delete/:id", validateAccessToken, async (req, res) => {
   // extract id from req.params
   const todoId = req.params.id;
@@ -72,7 +76,7 @@ router.delete("/todo/delete/:id", validateAccessToken, async (req, res) => {
   return res.status(200).send({ message: "Todo is deleted successfully." });
 });
 
-// ger todo with id
+// ? get todo with id
 router.get("/todo/details/:id", validateAccessToken, async (req, res) => {
   // extract id from req.params
   const todoId = req.params.id;
@@ -107,5 +111,57 @@ router.get("/todo/details/:id", validateAccessToken, async (req, res) => {
 
   return res.status(200).send(todo);
 });
+
+// ? add skip-limit-search
+router.post(
+  "/todo/list",
+  validateAccessToken,
+  validateReqBody(getTodoListValidationSchema),
+  async (req, res) => {
+    // extract page limit data from req.body
+    const { page, limit, search } = req.body;
+    // skip, limit, search
+    const skip = (page - 1) * limit;
+
+    let userId = req.userDetails._id;
+
+    const todos = await Todo.aggregate([
+      {
+        $match: {
+          userId: userId,
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } },
+          ],
+        }, // i => case sensitive meaning it searches both upper and lowercase characters
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      // {
+      //   $unwind: "$userDetails",
+      // },
+      {
+        $project: {
+          userId: 0,
+          "userDetails._id": 0,
+          "userDetails.password": 0,
+        },
+      },
+    ]);
+    return res.status(200).send(todos);
+  }
+);
 
 export default router;
