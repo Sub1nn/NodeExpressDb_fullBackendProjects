@@ -15,3 +15,16 @@ export const vehicleValidationSchema = Yup.object({
 
   torque: Yup.number().min(0, "Torque cannot be negative.").required(),
 });
+
+// skip-limit data validation
+
+export const getVehicleListValidationSchema = Yup.object({
+  page: Yup.number("Page must be a number")
+    .min(1, "Page must be at least 1")
+    .integer("Page must be an integer")
+    .default(1),
+  limit: Yup.number()
+    .min(1, "Limit must be at least 1")
+    .integer("Limit must be an integer")
+    .default(1),
+});
