@@ -9,10 +9,10 @@ import {
 
 const router = Router();
 
-// register new user
+// ? register new user
 router.post("/user/register", validateNewUser, registerUser);
 
-// login user
+// ? login user
 router.post("/user/login", validateEmail, loginInUser);
 
 export default router;
