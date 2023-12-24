@@ -6,30 +6,48 @@ import {
   getSingleVehicleDetail,
   getVehicleDetails,
   updateVehicle,
-  validateVehicleData,
   validateVehicleId,
   validateVehicleOwner,
 } from "./vehicle.service.js";
 import { validateAccessToken } from "../middlewares/authentication.middleware.js";
+import { Vehicle } from "./vehicle.model.js";
+import {
+  getVehicleListValidationSchema,
+  vehicleValidationSchema,
+} from "./vehicleValidation.schema.js";
+import { validateReqBody } from "../middlewares/validation.middleware.js";
 
 const router = express.Router();
-export default router;
 
 // ? create(add/register) a vehicle
-router.post("/add", validateAccessToken, validateVehicleData, addVehicle);
+router.post(
+  "/add",
+  validateAccessToken,
+  validateReqBody(vehicleValidationSchema),
+  addVehicle
+);
 
 // ? get the list of all vehicles
-router.get("/details", getVehicleDetails);
+router.get("/details", validateAccessToken, getVehicleDetails);
 
 // ? find a single vehicle
-router.get("/details/:id", validateVehicleId, getSingleVehicleDetail);
+router.get(
+  "/details/:id",
+  validateAccessToken,
+  validateVehicleId,
+  checkIfVehicleExists,
+  validateVehicleOwner,
+  getSingleVehicleDetail
+);
 
 // ? update a vehicle
 router.put(
   "/edit/:id",
-  validateVehicleData,
+  validateAccessToken,
   validateVehicleId,
   checkIfVehicleExists,
+  validateReqBody(vehicleValidationSchema),
+  validateVehicleOwner,
   updateVehicle
 );
 
@@ -42,3 +60,39 @@ router.delete(
   validateVehicleOwner,
   deleteVehicle
 );
+
+router.post(
+  "/list",
+  validateAccessToken,
+  validateReqBody(getVehicleListValidationSchema),
+  async (req, res) => {
+    const { page, limit, search } = req.body;
+    const skip = (page - 1) * limit;
+    const userId = req.user._id;
+    const vehicles = await Vehicle.aggregate([
+      {
+        $match: {
+          userId: userId,
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { description: { $regex: search, $options: "i" } },
+          ],
+        },
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
+      {
+        $project: {
+          userId: 0,
+        },
+      },
+    ]);
+    return res.status(200).send(vehicles);
+  }
+);
+
+export default router;
