@@ -6,7 +6,7 @@ import {
   userEmailSchemaValidation,
 } from "./user.schema.validation.js";
 
-// validate new user for registration
+// ? validate new user for registration
 export const validateNewUser = async (req, res, next) => {
   const newUser = req.body;
   try {
@@ -17,7 +17,7 @@ export const validateNewUser = async (req, res, next) => {
   next();
 };
 
-// register new user
+// ? register new user
 export const registerUser = async (req, res) => {
   const newUser = req.body;
   const user = await User.findOne({ email: newUser.email });
@@ -43,7 +43,7 @@ export const validateEmail = async (req, res, next) => {
   next();
 };
 
-// log the user in
+// ? log the user in
 export const loginInUser = async (req, res) => {
   const loginCredentials = req.body;
   const user = await User.findOne({ email: loginCredentials.email });
