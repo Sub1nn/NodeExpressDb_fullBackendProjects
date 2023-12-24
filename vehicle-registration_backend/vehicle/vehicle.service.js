@@ -34,11 +34,11 @@ export const validateVehicleOwner = async (req, res, next) => {
   const vehicle = await Vehicle.findById(vehicleId);
   const vehicleOwnerId = vehicle.userId;
   const tokenUserId = req.user._id;
-  const isOwnerOfVehicle = tokenUserId.equals(vehicleOwnerId);
+  const isOwnerOfVehicle = vehicleOwnerId.equals(tokenUserId);
   if (!isOwnerOfVehicle) {
-    res
-      .status(403)
-      .send({ message: "Only owner of the todo has authority to delete" });
+    res.status(403).send({
+      message: "Only owner of the vehicle has authority to manipulate data",
+    });
   }
   next();
 };
@@ -67,20 +67,20 @@ export const addVehicle = async (req, res) => {
   return res.status(200).send({ message: "Vehicle added successfully" });
 };
 
-// ? Get single vehicle details
+// ? Get a single vehicle details
 export const getSingleVehicleDetail = async (req, res) => {
   const vehicleId = req.params.id;
-  const vehicle = await Vehicle.findById(vehicleId);
+  const vehicle = await Vehicle.findById(vehicleId, { userId: 0 });
   if (!vehicle) {
-    res.status(400).send({ message: "Invalid vehicle Id" });
+    return res.status(400).send({ message: "Invalid vehicle Id" });
   }
   return res.status(200).send(vehicle);
 };
 
-// ? get  all vehicle details
+// ? get all vehicle details
 export const getVehicleDetails = async (req, res) => {
   try {
-    const vehicleList = await Vehicle.find();
+    const vehicleList = await Vehicle.find({}, { userId: 0 });
     return res.status(200).send(vehicleList);
   } catch (error) {
     return res.status(400).send(error.message);
