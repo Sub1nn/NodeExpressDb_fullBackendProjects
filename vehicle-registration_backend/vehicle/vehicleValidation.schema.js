@@ -9,11 +9,16 @@ export const vehicleValidationSchema = Yup.object({
 
   model: Yup.number().min(2000).max(2100).required(),
 
-  color: Yup.array().of(Yup.string().trim()).required(),
+  color: Yup.array()
+    .of(Yup.string().transform((value) => value.trim()))
+    .required(),
 
-  power: Yup.number().min(0, "Power cannot be negative.").required(),
+  power: Yup.number().min(0, "Power cannot be negative.").positive().required(),
 
-  torque: Yup.number().min(0, "Torque cannot be negative.").required(),
+  torque: Yup.number()
+    .min(0, "Torque cannot be negative.")
+    .positive()
+    .required(),
 });
 
 // skip-limit data validation
