@@ -1,19 +1,5 @@
-import { Vehicle } from "./vehicle.model.js";
-import { vehicleValidationSchema } from "./vehicleValidation.schema.js";
 import { checkMongoIdValidity } from "../utils/mongoId.validation.js";
-
-// ? validate vehicle data
-export const validateVehicleData = async (req, res, next) => {
-  // extract vehicle data from req.body
-  const newVehicle = req.body;
-  // validate vehicle data
-  try {
-    await vehicleValidationSchema.validate(newVehicle);
-  } catch (error) {
-    return res.status(400).send({ message: error.message });
-  }
-  next();
-};
+import { Vehicle } from "./vehicle.model.js";
 
 // ? validate vehicle id
 export const validateVehicleId = (req, res, next) => {
