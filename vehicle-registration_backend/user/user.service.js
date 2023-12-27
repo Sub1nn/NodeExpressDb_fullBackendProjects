@@ -1,21 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "./user.model.js";
-import {
-  userDataSchemaValidation,
-  userEmailSchemaValidation,
-} from "./user.schema.validation.js";
-
-// ? validate new user for registration
-export const validateNewUser = async (req, res, next) => {
-  const newUser = req.body;
-  try {
-    await userDataSchemaValidation.validate(newUser);
-  } catch (error) {
-    return res.status(400).send({ message: error.message });
-  }
-  next();
-};
 
 // ? register new user
 export const registerUser = async (req, res) => {
@@ -30,17 +15,6 @@ export const registerUser = async (req, res) => {
   newUser.password = hashedPassword;
   await User.create(newUser);
   return res.status(201).send({ message: "user registered successfully" });
-};
-
-// validate user email for logging in
-export const validateEmail = async (req, res, next) => {
-  const loginCredentials = req.body;
-  try {
-    await userEmailSchemaValidation.validate(loginCredentials.email);
-  } catch (error) {
-    return res.status(400).send({ message: error.message });
-  }
-  next();
 };
 
 // ? log the user in
@@ -58,9 +32,27 @@ export const loginInUser = async (req, res) => {
     return res.status(401).send({ message: "Invalid email or password" });
   }
   user.password = undefined;
-  const token = jwt.sign(
-    { email: user.email },
-    process.env.ACCESS_TOKEN_SECRET
+  // generate access-token, refresh-token
+  const accessToken = jwt.sign(
+    { email: user.email, _id: user._id },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: "2h" }
   );
-  return res.status(200).send({ user, accessToken: token });
+  const refreshToken = jwt.sign(
+    { email: user.email },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "2d" }
+  );
+  user.refreshToken = refreshToken;
+  // logged in user
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+  return res
+    .status(200)
+    .send({
+      user: loggedInUser,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
 };
