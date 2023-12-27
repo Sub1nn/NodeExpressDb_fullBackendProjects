@@ -22,6 +22,13 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
+    avatar: {
+      type: String, // cloudinary url
+      required: true,
+    },
+    coverImage: {
+      type: String, // cloudinary url
+    },
     password: {
       type: String,
       required: true,
@@ -29,6 +36,9 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ["male", "female", "preferNotToSay"],
+    },
+    refreshToken: {
+      type: String,
     },
   },
   {
