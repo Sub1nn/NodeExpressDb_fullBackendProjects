@@ -19,10 +19,11 @@ export const userDataSchemaValidation = Yup.object({
     .min(4, "password must contain at least 4 characters")
     .max(25, "password must not exceed 25 characters"),
   gender: Yup.string().trim().oneOf(["male", "female", "preferNotToSay"]),
+  avatar: Yup.string().required(),
 });
 
 export const userEmailSchemaValidation = Yup.string()
-  .email("must be a valid email address")
+  .email("Must be a valid email address")
   .trim()
-  .required()
-  .lowercase();
+  .lowercase()
+  .required("Email is required");
