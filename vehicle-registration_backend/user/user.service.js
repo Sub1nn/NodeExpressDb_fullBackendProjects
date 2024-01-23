@@ -48,7 +48,8 @@ export const loginInUser = async (req, res) => {
     { expiresIn: "2d" }
   );
   user.refreshToken = refreshToken;
-  // logged in user
+
+  // get logged in user details without selecting password and refresh token as follows
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
