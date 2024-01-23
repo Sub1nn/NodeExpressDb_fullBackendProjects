@@ -19,11 +19,14 @@ export const registerUser = async (req, res) => {
 
 // ? log the user in
 export const loginInUser = async (req, res) => {
+  // get login credentials from req.body
   const loginCredentials = req.body;
+  // check if user exists
   const user = await User.findOne({ email: loginCredentials.email });
   if (!user) {
     return res.status(404).send({ message: "user not found" });
   }
+  // check if password matches
   const passwordMatch = await bcrypt.compare(
     loginCredentials.password,
     user.password
@@ -31,6 +34,7 @@ export const loginInUser = async (req, res) => {
   if (!passwordMatch) {
     return res.status(401).send({ message: "Invalid email or password" });
   }
+  // remove password from user
   user.password = undefined;
   // generate access-token, refresh-token
   const accessToken = jwt.sign(
@@ -48,11 +52,10 @@ export const loginInUser = async (req, res) => {
   const loggedInUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
-  return res
-    .status(200)
-    .send({
-      user: loggedInUser,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    });
+  // return appropriate response
+  return res.status(200).send({
+    user: loggedInUser,
+    accessToken: accessToken,
+    refreshToken: refreshToken,
+  });
 };
